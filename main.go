@@ -1,46 +1,57 @@
 package main
 
 import (
-    "context"
-    //"fmt"
-    "log"
+	"context"
+	"log"
+	"os"
 
-    "github.com/aws/aws-sdk-go-v2/aws"
-    "github.com/aws/aws-sdk-go-v2/config"
-    "github.com/aws/aws-sdk-go-v2/service/ec2"
+	"github.com/aws/aws-sdk-go-v2/aws"
+	"github.com/aws/aws-sdk-go-v2/config"
+	"github.com/aws/aws-sdk-go-v2/service/ec2"
+	"github.com/urfave/cli/v2"
 )
 
-var foo = "foo"
-
 func main() {
-    cfg, err := config.LoadDefaultConfig(context.TODO(), config.WithRegion("us-west-2"))
-    if err != nil {
-        log.Fatalf("unable to load SDK config, %v", err)
-    }
+	app := &cli.App{
+		Name:   "modifylt",
+		Usage:  "modify launch template",
+		Action: modify,
+	}
+
+	app.Flags = []cli.Flag {
+		&cli.StringFlag{
+		  Name: "launch-template-id",
+		  Usage: "Launch template ID",
+		  Required: true,
+		},
+		&cli.StringFlag{
+			Name: "default-version",
+			Usage: "Version to set as default",
+			Required: true,
+		},
+	  }
+
+	err := app.Run(os.Args)
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+
+func modify(c *cli.Context) error {
+	cfg, err := config.LoadDefaultConfig(context.TODO())
+	if err != nil {
+		return err
+	}
 
 	client := ec2.NewFromConfig(cfg)
 
 	_, err = client.ModifyLaunchTemplate(context.TODO(), &ec2.ModifyLaunchTemplateInput{
-		LaunchTemplateId: aws.String("foo"),
-		DefaultVersion: &foo,
+		LaunchTemplateId: aws.String(c.String("launch-template-id")),
+		DefaultVersion:   aws.String(c.String("default-version")),
 	})
 	if err != nil {
-        log.Fatalf("ModifyLaunchTemplate error: %v", err)
-    }
+		return err
+	}
 
-    // // Using the Config value, create the DynamoDB client
-    // svc := dynamodb.NewFromConfig(cfg)
-
-    // // Build the request with its input parameters
-    // resp, err := svc.ListTables(context.TODO(), &dynamodb.ListTablesInput{
-    //     Limit: aws.Int32(5),
-    // })
-    // if err != nil {
-    //     log.Fatalf("failed to list tables, %v", err)
-    // }
-
-    // fmt.Println("Tables:")
-    // for _, tableName := range resp.TableNames {
-    //     fmt.Println(tableName)
-    // }
+	return nil
 }
