@@ -2,6 +2,8 @@ package main
 
 import (
 	"context"
+	"encoding/json"
+	"fmt"
 	"log"
 	"os"
 
@@ -18,18 +20,18 @@ func main() {
 		Action: modify,
 	}
 
-	app.Flags = []cli.Flag {
+	app.Flags = []cli.Flag{
 		&cli.StringFlag{
-		  Name: "launch-template-id",
-		  Usage: "Launch template ID",
-		  Required: true,
-		},
-		&cli.StringFlag{
-			Name: "default-version",
-			Usage: "Version to set as default",
+			Name:     "launch-template-id",
+			Usage:    "Launch template ID",
 			Required: true,
 		},
-	  }
+		&cli.StringFlag{
+			Name:     "default-version",
+			Usage:    "Version to set as default",
+			Required: true,
+		},
+	}
 
 	err := app.Run(os.Args)
 	if err != nil {
@@ -45,13 +47,20 @@ func modify(c *cli.Context) error {
 
 	client := ec2.NewFromConfig(cfg)
 
-	_, err = client.ModifyLaunchTemplate(context.TODO(), &ec2.ModifyLaunchTemplateInput{
+	output, err := client.ModifyLaunchTemplate(context.TODO(), &ec2.ModifyLaunchTemplateInput{
 		LaunchTemplateId: aws.String(c.String("launch-template-id")),
 		DefaultVersion:   aws.String(c.String("default-version")),
 	})
 	if err != nil {
 		return err
 	}
+
+	json, err := json.MarshalIndent(output.LaunchTemplate, "", "\t")
+	if err != nil {
+		return err
+	}
+
+	fmt.Printf("%s\n", json)
 
 	return nil
 }
