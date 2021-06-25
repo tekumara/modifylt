@@ -7,7 +7,6 @@ import (
 	"log"
 	"os"
 
-	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/service/ec2"
 	"github.com/urfave/cli/v2"
@@ -17,7 +16,9 @@ func main() {
 	app := &cli.App{
 		Name:   "modifylt",
 		Usage:  "modify launch template",
-		Action: modify,
+		Action: func (c *cli.Context) error {
+			return modify(c.String("launch-template-id"), c.String("default-version"))
+		},
 	}
 
 	app.Flags = []cli.Flag{
@@ -39,7 +40,7 @@ func main() {
 	}
 }
 
-func modify(c *cli.Context) error {
+func modify(id string, defaultVersion string) error {
 	cfg, err := config.LoadDefaultConfig(context.TODO())
 	if err != nil {
 		return err
@@ -48,8 +49,8 @@ func modify(c *cli.Context) error {
 	client := ec2.NewFromConfig(cfg)
 
 	output, err := client.ModifyLaunchTemplate(context.TODO(), &ec2.ModifyLaunchTemplateInput{
-		LaunchTemplateId: aws.String(c.String("launch-template-id")),
-		DefaultVersion:   aws.String(c.String("default-version")),
+		LaunchTemplateId: &id,
+		DefaultVersion:   &defaultVersion,
 	})
 	if err != nil {
 		return err
