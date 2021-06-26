@@ -4,45 +4,38 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"log"
 	"os"
 
+	"flag"
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/service/ec2"
-	"github.com/urfave/cli/v2"
 )
 
 var (
-    version = "dev"
+	version = "dev"
 )
 
 func main() {
-	app := &cli.App{
-		Name:   "modifylt",
-		Usage:  "modify launch template",
-		Action: func (c *cli.Context) error {
-			return modify(c.String("launch-template-id"), c.String("default-version"))
-		},
-	}
-
-	app.Flags = []cli.Flag{
-		&cli.StringFlag{
-			Name:     "launch-template-id",
-			Usage:    "Launch template ID",
-			Required: true,
-		},
-		&cli.StringFlag{
-			Name:     "default-version",
-			Usage:    "Version to set as default",
-			Required: true,
-		},
-	}
-
 	fmt.Fprintln(os.Stderr, "modifylt", version)
-	err := app.Run(os.Args)
-	if err != nil {
-		log.Fatal(err)
+
+	id := flag.String("launch-template-id", "", "Launch template Id")
+	defaultVersion := flag.String("default-version", "", "Version to set as default")
+
+	flag.Parse()
+
+	if *id == "" || *defaultVersion == "" {
+		flag.Usage()
+		os.Exit(1)
 	}
+
+	if err := modify(*id, *defaultVersion); err != nil {
+		die(err)
+	}
+}
+
+func die(v ...interface{}) {
+	fmt.Fprintln(os.Stderr, v...)
+	os.Exit(1)
 }
 
 func modify(id string, defaultVersion string) error {

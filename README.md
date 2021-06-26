@@ -6,19 +6,12 @@ modifylt takes command lines flags that mimic `aws ec2 modify-launch-template`.
 This makes it a drop-in replacement for aws-cli when you want to keep your deployment containers lean :-)
 
 ```
-NAME:
-   modifylt - modify launch template
-
-USAGE:
-   modifylt [global options] command [command options] [arguments...]
-
-COMMANDS:
-   help, h  Shows a list of commands or help for one command
-
-GLOBAL OPTIONS:
-   --launch-template-id value  Launch template ID
-   --default-version value     Version to set as default
-   --help, -h                  show help (default: false)
+modifylt dev
+Usage of modifylt:
+  -default-version string
+        Version to set as default
+  -launch-template-id string
+        Launch template Id
 ```
 
 Example:
