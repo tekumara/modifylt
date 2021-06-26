@@ -12,6 +12,10 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
+var (
+    version = "dev"
+)
+
 func main() {
 	app := &cli.App{
 		Name:   "modifylt",
@@ -34,6 +38,7 @@ func main() {
 		},
 	}
 
+	fmt.Fprintln(os.Stderr, "modifylt", version)
 	err := app.Run(os.Args)
 	if err != nil {
 		log.Fatal(err)
