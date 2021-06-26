@@ -23,9 +23,19 @@ jobs:
 
       - name: goreleaser
         uses: goreleaser/goreleaser-action@v1
+        if: !startsWith(github.ref, 'refs/tags/')
         with:
           version: latest
           args: --snapshot --skip-publish --rm-dist
+
+      - name: goreleaser
+        uses: goreleaser/goreleaser-action@v1
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          version: latest
+          args: release --rm-dist
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: upload artifact
         uses: actions/upload-artifact@v2
