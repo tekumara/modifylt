@@ -20,6 +20,7 @@ func main() {
 		Name:  "modifylt",
 		Usage: "modify launch template",
 		Action: func(c *cli.Context) error {
+			fmt.Fprintln(os.Stderr, "modifylt", version)
 			return modify(c.String("launch-template-id"), c.String("default-version"))
 		},
 	}
@@ -37,7 +38,6 @@ func main() {
 		},
 	}
 
-	fmt.Fprintln(os.Stderr, "modifylt", version)
 	err := app.Run(os.Args)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
