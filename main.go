@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"log"
 	"os"
 
 	"github.com/aws/aws-sdk-go-v2/config"
@@ -13,14 +12,14 @@ import (
 )
 
 var (
-    version = "dev"
+	version = "dev"
 )
 
 func main() {
 	app := &cli.App{
-		Name:   "modifylt",
-		Usage:  "modify launch template",
-		Action: func (c *cli.Context) error {
+		Name:  "modifylt",
+		Usage: "modify launch template",
+		Action: func(c *cli.Context) error {
 			return modify(c.String("launch-template-id"), c.String("default-version"))
 		},
 	}
@@ -41,7 +40,8 @@ func main() {
 	fmt.Fprintln(os.Stderr, "modifylt", version)
 	err := app.Run(os.Args)
 	if err != nil {
-		log.Fatal(err)
+		fmt.Fprintln(os.Stderr, err)
+		os.Exit(1)
 	}
 }
 
